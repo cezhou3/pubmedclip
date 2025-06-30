@@ -7,9 +7,9 @@ INPUT_SIZE: (250, 250)
 DATASET:
   DATASET: 'ROCO'
   DATA_TYPE: 'jpg'
-  TRAIN_JSON: "/workspace/data/VQA_RAD/train_dataset.json"
-  VALID_JSON: "/workspace/data/VQA_RAD/validation_dataset.json"
-  DATA_DIR: '/workspace/data/VQA_RAD/images'
+  TRAIN_JSON: "/workspace/data/VQA-RAD/vqa_rad_train_pubmedclip.jsonl"
+  VALID_JSON: "/workspace/data/VQA-RAD/vqa_rad_test_pubmedclip.jsonl"
+  DATA_DIR: '/workspace/data/VQA-RAD/images'
 
 LOSS:
   LOSS_TYPE: 'CrossEntropy'
@@ -22,7 +22,7 @@ TRAIN:
   RESUME: False 
   INPUT_SNAPSHOT: "" 
   VISION_ENCODER: "ViT-B/32"
-  PRETRAINED_MODEL_PATH: "/workspace/model/PubMedCLIP/PubMedCLIP_VIT32.pth"
+  PRETRAINED_MODEL_PATH: "/workspace/model/PubMedCLIP/PubMedCLIP_ViT32.pth"
   LOAD_PRETRAINED: True
   FREEZE_VISION_ENCODER: False
   FREEZE_TEXT_ENCODER: False

@@ -49,7 +49,7 @@ chmod +x $MAINPROG
 
 #######***************************##########
 # Fine-tune ViT-B/32 model
-if [ -f "$PRETRAINED_DIR/PubMedCLIP_VIT32.pth" ]; then
+if [ -f "$PRETRAINED_DIR/PubMedCLIP_ViT32.pth" ]; then
     echo "Fine-tuning PubMedCLIP ViT-B/32 model..."
     CONFIGFILE=./configs/medclip_finetune_vit32.yaml
     python $MAINPROG --cfg $CONFIGFILE --gpu 0
