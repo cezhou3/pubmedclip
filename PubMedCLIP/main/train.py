@@ -43,6 +43,39 @@ def train(cfg, train_loader, eval_loader, device):
         os.makedirs(model_dir)
     logger.info(f"-------Loading CLIP with vision encoder {cfg.TRAIN.VISION_ENCODER} -------")
     model, preprocess = clip.load(cfg.TRAIN.VISION_ENCODER, device=device, jit=False)
+    
+    # Load pre-trained PubMedCLIP model if specified
+    if cfg.TRAIN.LOAD_PRETRAINED and cfg.TRAIN.PRETRAINED_MODEL_PATH:
+        logger.info(f"-------Loading pre-trained PubMedCLIP model from {cfg.TRAIN.PRETRAINED_MODEL_PATH} -------")
+        if os.path.exists(cfg.TRAIN.PRETRAINED_MODEL_PATH):
+            checkpoint = torch.load(cfg.TRAIN.PRETRAINED_MODEL_PATH, map_location=device)
+            if 'state_dict' in checkpoint:
+                model.load_state_dict(checkpoint['state_dict'])
+                logger.info("Successfully loaded pre-trained model state dict")
+            else:
+                model.load_state_dict(checkpoint)
+                logger.info("Successfully loaded pre-trained model")
+        else:
+            logger.warning(f"Pre-trained model path {cfg.TRAIN.PRETRAINED_MODEL_PATH} does not exist!")
+    
+    # Freeze encoders if specified
+    if cfg.TRAIN.FREEZE_VISION_ENCODER:
+        logger.info("Freezing vision encoder parameters")
+        for param in model.visual.parameters():
+            param.requires_grad = False
+    
+    if cfg.TRAIN.FREEZE_TEXT_ENCODER:
+        logger.info("Freezing text encoder parameters")
+        for param in model.transformer.parameters():
+            param.requires_grad = False
+        for param in model.token_embedding.parameters():
+            param.requires_grad = False
+        for param in model.positional_embedding:
+            param.requires_grad = False
+        model.ln_final.weight.requires_grad = False
+        model.ln_final.bias.requires_grad = False
+        model.text_projection.requires_grad = False
+    
     if device == "cpu":
           model.float()
     else :
@@ -120,7 +153,7 @@ def train(cfg, train_loader, eval_loader, device):
             if train_all_loss < best_loss:
                 best_loss = train_all_loss
                 best_epoch = epoch
-                best_model = mode
+                best_model = model
                 torch.save({
                     'best_epoch': best_epoch,
                     'state_dict': model.state_dict(),
